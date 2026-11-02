@@ -16,7 +16,12 @@ const server = http.createServer();
 const io = new Server(server, {
   path: SOCKET_PATH,
   transports: ['websocket'],
-  cors: { origin: '*' },
+  cors: {
+    origin: true,
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+  allowEIO3: true,
 });
 
 function emitPlayersUpdate(pin: string) {

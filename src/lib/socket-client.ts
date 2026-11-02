@@ -1,12 +1,15 @@
 import { io, Socket } from 'socket.io-client';
 import { SOCKET_PATH } from '@/src/shared/events';
 
-export const socket: Socket = io({
+const socketUrl = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+
+export const socket: Socket = io(socketUrl, {
   path: SOCKET_PATH,
   transports: ['websocket'],
   reconnection: true,
   reconnectionAttempts: Infinity,
   autoConnect: true,
+  secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
 });
 
 socket.on('connect', () => {
