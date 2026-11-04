@@ -1,4 +1,6 @@
 import http from 'http';
+import { Redis } from 'ioredis';
+import { createAdapter } from '@socket.io/redis-adapter';
 import { Server } from 'socket.io';
 import { SOCKET_PATH } from '@/src/shared/events';
 import {
@@ -23,6 +25,16 @@ const io = new Server(server, {
   },
   allowEIO3: true,
 });
+
+const tcpUrl = process.env.UPSTASH_REDIS_TCP_URL;
+if (tcpUrl) {
+  const pubClient = new Redis(tcpUrl, {
+    maxRetriesPerRequest: 3,
+    enableReadyCheck: false,
+  });
+  const subClient = pubClient.duplicate();
+  io.adapter(createAdapter(pubClient, subClient));
+}
 
 function emitPlayersUpdate(pin: string) {
   const room = getRoom(pin);
